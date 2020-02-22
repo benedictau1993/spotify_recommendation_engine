@@ -707,19 +707,41 @@ def scrape_search_tracks_info(requests_counter_init, alphanum, offset):
     return requests_counter, cleaned_20_random_track_dicts_list
 
 def run_scrape_search_tracks_info():
+    print("Sampling tracks from Spotify's library:\n")
     alphanums = (string.ascii_lowercase + string.digits)
     offsets = list(map(str, np.arange(0,5000, 20).tolist())) 
-    print("Sampling tracks from Spotify's library:\n")
-    start_time = time.time()
     requests_counter_init = 0
-    tracks_collection = []
+    start_time = time.time()
     i = 0
+    counter = 0
+    tracks_collection = []
     for alphanum in alphanums:
         for offset in offsets: 
             split_time = time.time()
-            print("\033[FIteration:", i, alphanum, offset, "  Sampled Tracks:", i*20, "  Total Requests:", requests_counter_init, "  Runtime (min):", floor((split_time - start_time)/60))
             requests_counter_init, tracks_info = scrape_search_tracks_info(requests_counter_init, alphanum, offset)
+            counter += len_random_track_list
+            print("\033[FIteration:", i, alphanum, offset, 
+                  "  Sampled Tracks:", counter, 
+                  "  Total Requests:", requests_counter_init, 
+                  "  Runtime (min):", floor((split_time - start_time)/60)
+                 )
             with open('scraped_search_tracks.txt', 'a') as f:
                 for item in tracks_info:
                     f.write("%s\n" % item)
             i += 1
+
+def read_row_dicts(file):
+    # reads text file with a dictionaries separated with "\n"
+    # all dicts have same keys; outputs pandas df
+    # 100 MB data (54K x46 col)
+    import ast 
+    with open(file) as f:
+        line = f.readline()
+        keys = list(ast.literal_eval(line.rstrip("\n")).keys())
+        data_list = []
+        while line:
+            data_list.append(list(ast.literal_eval(line.rstrip("\n")).values()))
+            line = f.readline()
+    df = pd.DataFrame(data_list, columns=keys)  
+    return df
+    
