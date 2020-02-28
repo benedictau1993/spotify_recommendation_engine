@@ -744,4 +744,171 @@ def read_row_dicts(file):
             line = f.readline()
     df = pd.DataFrame(data_list, columns=keys)  
     return df
+
+def my_tracks_uri():
+    # grabs uris from top_tracks and saved_tracks and puts them into a dataframe
+    # prerequisite is that the object clean_master_user_profile is loaded into the kernel prior to runing this function
     
+    # instantiate lists
+    top_tracks = []
+    saved_tracks = []
+
+    # pull top_tracks
+    for i in range(len(cleaned_master_user_profile["top_tracks"])):
+        top_tracks.append(cleaned_master_user_profile["top_tracks"][i]["uri"])
+
+    # pull saved_tracks
+    for i in range(len(cleaned_master_user_profile["saved_tracks"])):
+        saved_tracks.append(cleaned_master_user_profile["saved_tracks"][i]["uri"])
+
+    # create dataframe for top_tracks
+    top_tracks_df = pd.DataFrame(top_tracks)
+    top_tracks_df = top_tracks_df.rename(columns = {0:"uri"})
+    top_tracks_df["type"] = "top_tracks"
+
+    # create dataframe for saved_tracks
+    saved_tracks_df = pd.DataFrame(saved_tracks)
+    saved_tracks_df = saved_tracks_df.rename(columns = {0:"uri"})
+    saved_tracks_df["type"] = "saved_tracks"
+
+    # concat dataframes
+    tracks = pd.concat([top_tracks_df, saved_tracks_df], axis = 0)
+
+    # get dummies from type
+    tracks = pd.concat([tracks.drop("type", axis = 1), pd.get_dummies(tracks["type"])], axis = 1)
+    
+    # print result
+    print("The dataframe tracks is loaded into your kernel now and looks like this:", "\n", tracks.head())
+
+def new_def(tracks_df):
+    # input: Julian's tracks pandas df
+    # output: txt file with dicts that has track info
+    tracks_uri_list = [track.split(':')[2] for track in list(tracks_df["uri"].values)]
+
+    for track in tracks_uri_list:
+
+        get_token(auth_json)
+        headers = {
+            'Accept':'application/json',
+            'Content-Type':'application/json',
+            'Authorization':'Bearer {}'.format(refreshed_token)
+            }
+
+        # get track info 
+        track_enpoint = "https://api.spotify.com/v1/track/"
+        track_uri_string = track_uri
+        album_url = album_endpoint + track_uri_string
+        global track_info
+        if album_info.status_code != 200:
+            print("Exception: Response", album_info.status_code, "at requests_counter =", requests_counter, "at album_info")
+            raise
+        global album_info_dict
+        track_info_dict = json.loads(track_info.text)
+        album_uri = track_info_dict["album"]["uri"]
+        artist_uri = track_info_dict["artist"]["uri"]
+
+        # get album info
+        album_endpoint = "https://api.spotify.com/v1/albums/"
+        album_uri_string = album_uri
+        album_url = album_endpoint + album_uri_string
+        global album_info
+        album_info = requests.get(url=album_url, headers=headers)
+        if album_info.status_code != 200:
+            print("Exception: Response", album_info.status_code, "at requests_counter =", requests_counter, "at album_info")
+            raise
+        global album_info_dict
+        album_info_dict = json.loads(album_info.text)
+
+        # get artist info
+        artist_enpoint = "https://api.spotify.com/v1/artists/"
+        artist_uri_string = artist_uri
+        artist_url = artist_enpoint + artist_uri_string
+        global artist_info
+        artist_info =  requests.get(url=artist_url, headers=headers)
+        if artist_info.status_code != 200:
+            print("Exception: Response", artist_info.status_code, "at requests_counter =", requests_counter, "at artist_info")
+            raise
+        global artist_info_dict
+        artist_info_dict = json.loads(artist_info.text)
+
+        # get track audio features
+        audio_features_endpoint = "https://api.spotify.com/v1/audio-features/"
+        global track_uri_string
+        track_uri_string = track_uri
+        audio_features_url = audio_features_endpoint + track_uri_string
+        global audio_features
+        audio_features = requests.get(url=audio_features_url, headers=headers)
+        if audio_features.status_code != 200:
+            print("Exception: Response", audio_features.status_code, "at requests_counter =", requests_counter, "at audio_features")
+            raise
+        global audio_features_dict
+        audio_features_dict = json.loads(audio_features.text)
+              
+        # get track audio analysis
+        audio_analysis_endpoint = "https://api.spotify.com/v1/audio-analysis/"
+        audio_analysis_url = audio_analysis_endpoint + track_uri_string.split(",")[i]
+        global audio_analysis
+        audio_analysis = requests.get(url=audio_analysis_url, headers=headers)
+        global audio_analysis_dict
+        if audio_analysis.status_code == 404:
+            audio_analysis_dict = None
+        elif audio_analysis.status_code == 429:
+            print("Exception: Response", audio_analysis.status_code, "at requests_counter =", requests_counter, "at audio_analysis, with track_uri =", track_uri_string.split(",")[i])
+            raise
+        else: 
+            audio_analysis_dict = json.loads(audio_analysis.text)  
+        
+        global cleaned_track_dict
+        cleaned_track_dict = {
+            "name":random_track_dict["tracks"]["items"][i]["name"],
+            "uri":random_track_dict["tracks"]["items"][i]["uri"],
+            "album_uri":random_track_dict["tracks"]["items"][i]["album"]["uri"],
+            "album_label":album_info_dict["albums"][i]["label"],
+            "album_name":album_info_dict["albums"][i]["name"],
+            "album_popularity":album_info_dict["albums"][i]["popularity"],
+            "album_release_date":album_info_dict["albums"][i]["release_date"],
+            "artist_uri":random_track_dict["tracks"]["items"][i]["artists"][0]["uri"],
+            "artist_name":artist_info_dict["artists"][i]["name"],
+            "artist_popularity":artist_info_dict["artists"][i]["popularity"],
+            "artist_followers":artist_info_dict["artists"][i]["followers"]["total"],
+            "duration_ms":random_track_dict["tracks"]["items"][i]["duration_ms"],
+            "explicit":random_track_dict["tracks"]["items"][i]["explicit"],
+            "popularity":random_track_dict["tracks"]["items"][i]["popularity"],
+            "track_number":random_track_dict["tracks"]["items"][i]["track_number"],
+            "genre":artist_info_dict["artists"][i]["genres"],
+            "acousticness":audio_features_dict["audio_features"][i]["acousticness"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "danceability":audio_features_dict["audio_features"][i]["danceability"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "energy":audio_features_dict["audio_features"][i]["energy"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "instrumentalness":audio_features_dict["audio_features"][i]["instrumentalness"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "liveness":audio_features_dict["audio_features"][i]["liveness"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "loudness":audio_features_dict["audio_features"][i]["loudness"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "speechiness":audio_features_dict["audio_features"][i]["speechiness"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "valence":audio_features_dict["audio_features"][i]["valence"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "tempo":audio_features_dict["audio_features"][i]["tempo"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "tempo_confidence":audio_analysis_dict["track"]["tempo_confidence"] if audio_analysis_dict is not None else "None",
+            "overall_key":audio_features_dict["audio_features"][i]["key"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "overall_key_confidence":audio_analysis_dict["track"]["key_confidence"] if audio_analysis_dict is not None else "None",
+            "mode":audio_features_dict["audio_features"][i]["mode"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "mode_confidence":audio_analysis_dict["track"]["mode_confidence"] if audio_analysis_dict is not None else "None",
+            "time_signature":audio_features_dict["audio_features"][i]["time_signature"] if audio_features_dict["audio_features"][i] is not None else "None",
+            "time_signature_confidence":audio_analysis_dict["track"]["time_signature_confidence"] if audio_analysis_dict is not None else "None",
+            "num_of_sections":len(audio_analysis_dict["sections"]) if audio_analysis_dict is not None else "None",
+            "section_durations":[section["duration"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_loudnesses":[section["loudness"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_tempos":[section["tempo"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_tempo_confidences":[section["tempo_confidence"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "num_of_keys":len(set([section["key"] for section in audio_analysis_dict["sections"]])) if audio_analysis_dict is not None else "None",
+            "section_keys":[section["key"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_key_confidences":[section["key_confidence"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "num_of_modes":len(set([section["mode"] for section in audio_analysis_dict["sections"]])) if audio_analysis_dict is not None else "None",
+            "section_modes":[section["mode"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_mode_confidences":[section["mode_confidence"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "num_of_time_signatures":len(set([section["time_signature"] for section in audio_analysis_dict["sections"]])) if audio_analysis_dict is not None else "None",
+            "section_time_signatures":[section["time_signature"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None",
+            "section_time_signature_confidences":[section["time_signature_confidence"] for section in audio_analysis_dict["sections"]] if audio_analysis_dict is not None else "None"
+        }
+        
+        with open('user_cleaned_tracks.txt', 'a') as f:
+            f.write("%s\n" % cleaned_track_dict)
+
+
