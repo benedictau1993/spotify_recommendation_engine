@@ -746,12 +746,13 @@ def read_row_dicts(file):
     return df
 
 def my_tracks_uri():
-    # grabs uris from top_tracks and saved_tracks and puts them into a dataframe
-    # prerequisite is that the object clean_master_user_profile is loaded into the kernel prior to runing this function
+    # grabs the uris from top_tracks, saved_tracks, and recently_played and puts them into a dataframe
+    # prerequisite is that the object clean_master_user_profile is loaded in the kernel prior to runing this function
     
     # instantiate lists
     top_tracks = []
     saved_tracks = []
+    recently_played = []
 
     # pull top_tracks
     for i in range(len(cleaned_master_user_profile["top_tracks"])):
@@ -760,6 +761,10 @@ def my_tracks_uri():
     # pull saved_tracks
     for i in range(len(cleaned_master_user_profile["saved_tracks"])):
         saved_tracks.append(cleaned_master_user_profile["saved_tracks"][i]["uri"])
+        
+    # pull recently_played
+    for i in range(len(cleaned_master_user_profile["recently_played"])):
+        recently_played.append(cleaned_master_user_profile["recently_played"][i]["uri"])
 
     # create dataframe for top_tracks
     top_tracks_df = pd.DataFrame(top_tracks)
@@ -770,12 +775,20 @@ def my_tracks_uri():
     saved_tracks_df = pd.DataFrame(saved_tracks)
     saved_tracks_df = saved_tracks_df.rename(columns = {0:"uri"})
     saved_tracks_df["type"] = "saved_tracks"
+    
+    # create dataframe for saved_tracks
+    recently_played_df = pd.DataFrame(recently_played)
+    recently_played_df = recently_played_df.rename(columns = {0:"uri"})
+    recently_played_df["type"] = "recently_played"
 
     # concat dataframes
-    tracks = pd.concat([top_tracks_df, saved_tracks_df], axis = 0)
+    tracks = pd.concat([top_tracks_df, saved_tracks_df, recently_played_df], axis = 0)
 
     # get dummies from type
     tracks = pd.concat([tracks.drop("type", axis = 1), pd.get_dummies(tracks["type"])], axis = 1)
+    
+    # reset the index
+    tracks = tracks.reset_index(drop=True)
     
     # print result
     print("The dataframe tracks is loaded into your kernel now and looks like this:", "\n", tracks.head())
@@ -908,3 +921,107 @@ def get_user_cleaned_tracks(tracks_df):
         
         with open('user_cleaned_tracks.txt', 'a') as f:
             f.write("%s\n" % cleaned_track_dict)
+
+def make_user_profile_spotify_playlist():
+    print("Please authorise Spotify Permissions.\n")
+    user_auth()
+    get_token(auth_json)
+    get_master_user_profile()
+    clean_master_user_profile()
+    print("Acquired your Spotify user profile. \n")
+    my_tracks_uri()
+    print("Your Spotify user profile has {} featured tracks.".format(len(tracks_df)))
+    print("Collecting audio features and audio analysis metadata to your favourite tracks. This should should take less than {} minutes.".format(round(len(tracks_df)*1.3/60)))
+    get_user_cleaned_tracks()
+    print("Collected all audio features and audio analysis metadata to your favourite tracks.")
+    print("Your user profile is saved as 'user_cleaned_tracks.txt'.")
+    global master_featured_tracks 
+    master_featured_tracks = read_row_dicts(get_user_cleaned_tracks_fname)
+    print("Your user profile is loaded as a pandas df 'master_featured_tracks'.")
+    user_id = cleaned_master_user_profile["profile"]["uri"].split(":")[2]
+    
+    master_featured_tracks = read_row_dicts(get_user_cleaned_tracks_fname)
+    master_featured_tracks_uri_list = list(master_featured_tracks["uri"].values)
+    len_master_featured_tracks_uri_list = len(master_featured_tracks_uri_list)
+    user_id = cleaned_master_user_profile["profile"]["uri"].split(":")[2]
+    get_token(auth_json)
+    headers = {
+        'Accept':'application/json',
+        'Content-Type':'application/json',
+        'Authorization':'Bearer {}'.format(refreshed_token)
+        }
+    create_playlist_endpoint = "https://api.spotify.com/v1/users/{}/playlists".format(user_id)
+    create_playlist_param = {
+        "name":"MyFeaturedTracks",
+        "description":"BA@UChicagoMSCA"
+    }
+    create_playlist = requests.post(create_playlist_endpoint, headers=headers, data=json.dumps(create_playlist_param))
+    create_playlist_dict = json.loads(create_playlist.text)
+    created_playlist_uri = create_playlist_dict["uri"].split(":")[2]  
+    master_featured_tracks_uri_list_chunks = [master_featured_tracks_uri_list[i*50:(i+1)* 50] 
+            for i in range((len(master_featured_tracks_uri_list)+50-1)//50)
+    ]
+    get_token(auth_json)
+    headers = {
+        'Accept':'application/json',
+        'Content-Type':'application/json',
+        'Authorization':'Bearer {}'.format(refreshed_token)
+        }
+    add_tracks_to_playlist_endpoint = "https://api.spotify.com/v1/playlists/{}/tracks".format(created_playlist_uri)
+    for chunk in master_featured_tracks_uri_list_chunks:
+        add_tracks_param = {
+                "uris":chunk
+        }
+        add_tracks = requests.post(add_tracks_to_playlist_endpoint, headers=headers, data=json.dumps(add_tracks_param))
+        add_tracks_dict = json.loads(add_tracks.text)
+    
+    # create playlist of 400 songs, with max 200 random songs from user profile, and 400-max(200) random songs from global playlist
+    # then shuffle, then push into a another new playlist
+    
+    global_song_list = read_row_dicts("scraped_search_tracks.txt")
+    # get total of 400 songs
+    if len_master_featured_tracks_uri_list > 200:
+        master_featured_tracks_sample = master_featured_tracks.sample(n = 200) 
+        global_song_list_sample = global_song_list.sample(n = 200) 
+        combined_sample = pd.concat([master_featured_tracks_sample, global_song_list_sample], sort=False).sample(frac=1).reset_index(drop=True)
+    else: 
+        master_featured_tracks_sample = master_featured_tracks.sample(n = len_master_featured_tracks_uri_list) 
+        global_song_list_sample = global_song_list.sample(n = 400-len_master_featured_tracks_uri_list) 
+        combined_sample = pd.concat([master_featured_tracks_sample, global_song_list_sample], sort=False).sample(frac=1).reset_index(drop=True)
+
+    combined_sample_uri_list = list(combined_sample["uri"].values)
+
+    get_token(auth_json)
+    headers = {
+        'Accept':'application/json',
+        'Content-Type':'application/json',
+        'Authorization':'Bearer {}'.format(refreshed_token)
+        }
+    create_playlist_endpoint = "https://api.spotify.com/v1/users/{}/playlists".format(user_id)
+    create_playlist_param = {
+        "name":"TestSample",
+        "description":"BA@UChicagoMSCA"
+    }
+    create_playlist = requests.post(create_playlist_endpoint, headers=headers, data=json.dumps(create_playlist_param))
+    create_playlist_dict = json.loads(create_playlist.text)
+    created_playlist_uri = create_playlist_dict["uri"].split(":")[2]  
+
+    combined_sample_uri_list_chunks = [combined_sample_uri_list[i*50:(i+1)* 50] 
+            for i in range((len(combined_sample_uri_list)+50-1)//50)
+    ]
+    get_token(auth_json)
+    headers = {
+        'Accept':'application/json',
+        'Content-Type':'application/json',
+        'Authorization':'Bearer {}'.format(refreshed_token)
+        }
+    add_tracks_to_playlist_endpoint = "https://api.spotify.com/v1/playlists/{}/tracks".format(created_playlist_uri)
+    for chunk in combined_sample_uri_list_chunks:
+        add_tracks_param = {
+                "uris":chunk
+        }
+        add_tracks = requests.post(add_tracks_to_playlist_endpoint, headers=headers, data=json.dumps(add_tracks_param))
+        add_tracks_dict = json.loads(add_tracks.text)
+
+
+    
