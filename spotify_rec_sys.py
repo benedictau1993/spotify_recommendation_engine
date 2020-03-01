@@ -735,7 +735,7 @@ def read_row_dicts(file):
     # all dicts have same keys; outputs pandas df
     # 100 MB data (54K x46 col)
     import ast 
-    with open(file) as f:
+    with open(file, encoding='utf-8') as f:
         line = f.readline()
         keys = list(ast.literal_eval(line.rstrip("\n")).keys())
         data_list = []
@@ -940,7 +940,6 @@ def make_user_profile_spotify_playlist():
     create_playlist = requests.post(create_playlist_endpoint, headers=headers, data=json.dumps(create_playlist_param))
     create_playlist_dict = json.loads(create_playlist.text)
     created_playlist_uri = create_playlist_dict["uri"].split(":")[2]  
-    print("Created Spotify playlist: MyFeaturedTracks.")
     master_featured_tracks_uri_list_chunks = [master_featured_tracks_uri_list[i*50:(i+1)* 50] 
             for i in range((len(master_featured_tracks_uri_list)+50-1)//50)
     ]
@@ -957,18 +956,14 @@ def make_user_profile_spotify_playlist():
         }
         add_tracks = requests.post(add_tracks_to_playlist_endpoint, headers=headers, data=json.dumps(add_tracks_param))
         add_tracks_dict = json.loads(add_tracks.text)
-    print("Populated Spotify playlist: MyFeaturedTracks.")
 
     # create playlist of 400 songs, with max 200 random songs from user profile, and 400-max(200) random songs from global playlist
     # then shuffle, then push into a another new playlist
-    print("Loading Spotify global library sample...")
     global_song_list = read_row_dicts("scraped_search_tracks.txt")
-    print("Loaded Spotify global library sample.")
-    print("Sampling 400 tracks from a list of your featured tracks and Spotify global library sample...")
     # get total of 400 songs
-    if len_master_featured_tracks_uri_list > 150:
-        master_featured_tracks_sample = master_featured_tracks.sample(n = 150) 
-        global_song_list_sample = global_song_list.sample(n = 250) 
+    if len_master_featured_tracks_uri_list > 100:
+        master_featured_tracks_sample = master_featured_tracks.sample(n = 100) 
+        global_song_list_sample = global_song_list.sample(n = 300) 
         combined_sample = pd.concat([master_featured_tracks_sample, global_song_list_sample], sort=False).sample(frac=1).reset_index(drop=True)
     else: 
         master_featured_tracks_sample = master_featured_tracks.sample(n = len_master_featured_tracks_uri_list) 
@@ -990,7 +985,6 @@ def make_user_profile_spotify_playlist():
     create_playlist = requests.post(create_playlist_endpoint, headers=headers, data=json.dumps(create_playlist_param))
     create_playlist_dict = json.loads(create_playlist.text)
     created_playlist_uri = create_playlist_dict["uri"].split(":")[2]  
-    print("Created Spotify playlist: TestSample.")
 
     combined_sample_uri_list_chunks = [combined_sample_uri_list[i*50:(i+1)* 50] 
             for i in range((len(combined_sample_uri_list)+50-1)//50)
@@ -1008,7 +1002,6 @@ def make_user_profile_spotify_playlist():
         }
         add_tracks = requests.post(add_tracks_to_playlist_endpoint, headers=headers, data=json.dumps(add_tracks_param))
         add_tracks_dict = json.loads(add_tracks.text)
-    print("Populated Spotify playlist: TestSample.")
 
     combined_sample["recently_played"] = [uri in list(tracks_df.loc[tracks_df["recently_played"]==1]["uri"].values) for uri in combined_sample["uri"]]
     combined_sample["saved_tracks"] = [uri in list(tracks_df.loc[tracks_df["saved_tracks"]==1]["uri"].values) for uri in combined_sample["uri"]]
@@ -1017,5 +1010,4 @@ def make_user_profile_spotify_playlist():
     combined_sample["Rating01"] = None
     combined_sample["Rating0-5"] = None
     combined_sample.to_csv("combined_sample.csv")
-    print("The sampled 400 tracks have been saved as combined_sample.csv.")
 
