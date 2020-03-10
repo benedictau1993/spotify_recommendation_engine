@@ -1,4 +1,6 @@
-# Spotify Recommendation Engine
+# Flexible content-based music recommendations using Spotify
+### *Tapping into the streaming giant’s wealth of data to create personal, configurable recommender systems*
+
 
 This is the repository for the final project for the Master's level Data Mining course at The University of Chicago. We are building an application to recommend tracks and curate new Spotify playlists with a variety of machine learning methods in Python. We aim to answer the following three questions:
 
