@@ -20,21 +20,38 @@ There are five sections in our project:
 
 #### 2. **Data preparation & feature engineering.**
 
+As a first step, we concatenate tracks collected from the user profile with tracks scraped from the Spotify library. Spotify provides their data in a rather clean format, so that data cleaning is limited to dropping duplicate tracks and unnecessary features as well as converting features to the appropriate data types. We decided to drop rows with missing data, given the limited number of missing values in relation to our dataset.
 
+This notebook also covers functions we developed for feature engineering such as categorizing the album label, transforming the release date, converting duration to minutes, and extracting section values. Spotify provides genre information on a very granular level. In order for us to be able to validate our clusters later in the analysis, we had to aggregate those sub-genres into higher-level genres. In order to do so, we converted the list of sub-genres into a string, applied the TdidfVectorizer on the string, reduced the dimensionality of the resulting matrix applying TruncatedSVD, and finally clustered the resulting data using K-Means into 13 genres.
+
+Because our dataset consists of data from multiple users, we wrote a function to drop remaining duplicates specifying a target user. As a final step, dummy variables are created for all categorical features.
 
 #### 3. **Clustering for Genre Creation.**
 
-
+The purpose of this notebook is to apply different clustering techniques to create clusters based on the audio features of tracks to define and validate music genres. We apply techniques such as t-SNE, DBSCAN, Agglomerative Clustering, and K-Means, explore their respective results, and finally evaluate their performance and applicability for our business problem.
 
 #### 4. **Data modelling.**
 
+For our recommendation systems, we approach the problem from four different angles.
+1. Classification models
+2. Regression models
+3. Track-based recommendation system
 
+  This notebook contains a function generating themed playlists based on songs a user likes or has listened to in the past. The function offers the user the ability to take the following approaches to receive recommendations:
+  -	It recommends new songs based on the audio features of a user's single favorite song.
+  -	It recommends new songs based on the average of the audio features of all songs a user has in its profile.
+  -	It recommends new songs based on the average of the audio features of any given list of songs the user specifies.
+
+
+4. Cluster-based recommendation system
 
 #### 5. **Playlist publication.**
 
 From the models in Section 3 and 4, we output three themed playlists with 10 tracks each for each of the above methods: Dance (danceability score > 0.7), Chill (tempo < 95, valence > 0.5), and Discover Unpopular (popularity < 60, artist popularity < 80).
 
 We have create a similar pipeline that takes the aforementioned playlists (stored as .csv files), (i) encodes the names of the playlists so the user/beta-tester does not know the theme or the method, (ii) creates playlists in the user's Spotify account, (iii) creates an encoding dictionary that allows the user to rate/comment on each of the playlists.
+
+Finally we provide a script that creates a playlist in a user's Spotify account, upon parsing the name of the desired playlist as well as a list of Spotify track URIs into the function.
 
 ## Files:
 
