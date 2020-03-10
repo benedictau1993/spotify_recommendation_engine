@@ -8,7 +8,7 @@ This is the repository for the final project for the Master's level Data Mining 
 
 ## Project scope
 
-There are five sections in our project:
+There are four sections in our project:
 
 #### 1. **Data acquisition.**
 
@@ -16,19 +16,15 @@ There are five sections in our project:
 
  We also created a function that searches for and scrapes 180,000 tracks from Spotify's library. It also collects album, artist information, as well as relevant audio features and analysis for each track. This serves as the sample of the Spotify library on which our recommendation engine would operate.
 
-#### 2. **Data preparation.**
+#### 2. **Data preparation & feature engineering.**
 
 
 
-#### 3. **Genre clustering.**
+#### 3. **Data modelling.**
 
 
 
-#### 4. **Data modelling.**
-
-
-
-#### 5. **Playlist publication.**
+#### 4. **Playlist publication.**
 
 From the models in Section 3 and 4, we output three themed playlists with 10 tracks each for each of the above methods: Dance (danceability score > 0.7), Chill (tempo < 95, valence > 0.5), and Discover Unpopular (popularity < 60, artist popularity < 80).
 
