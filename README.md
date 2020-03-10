@@ -1,29 +1,51 @@
 # Spotify Recommendation Engine
 
-This is a work in progress for the Master's Data Mining course at the University of Chicago. We are building an application to curate new Spotify playlists with machine learning methods in Python and MySQL. We create a pipeline to compile user playback and library data through Spotify’s API with OAuth 2.0 authorization protocol. Then we predict the user’s affinity for songs in Spotify global library using clustering and neural network methods. Lastly, validate the model with user experimental trials and comparison against Spotify’s weekly recommended playlist.
+This is the repository for the final project for the Master's level Data Mining course at The University of Chicago. We are building an application to recommend tracks and curate new Spotify playlists with a variety of machine learning methods in Python. We aim to answer the following three questions:
+
+1. Could we define music genres using unsupervised machine learning/clustering techniques?
+2. Could we create content-based recommendation engine based on a user's music profile?
+3. What are potential applications of our models?
+
+## Project scope
+
+There are five sections in our project:
+
+#### 1. **Data acquisition.**
+
+ The data used for this project is collected over the Spotify API. We created a pipeline that (i) handles OAuth 2.0 authorization protocol, (ii) complies a comprehensive profile for the user for their own edification, (iii) collect audio features and analysis data on the tracks within the user profile, and (iv) pushes two playlists into the user's Spotify account: one that contains all tracks in the profile, another contains a random selection of tracks from both the user profile and from the Spotify library. The latter playlist is accompanied with a spreadsheet that allows a test user to label whether they approve of the song (both binary and on a 1-5 star scale).
+
+ We also created a function that searches for and scrapes 180,000 tracks from Spotify's library. It also collects album, artist information, as well as relevant audio features and analysis for each track. This serves as the sample of the Spotify library on which our recommendation engine would operate.
+
+#### 2. **Data preparation.**
+
+
+
+#### 3. **Genre clustering.**
+
+
+
+#### 4. **Data modelling.**
+
+
+
+#### 5. **Playlist publication.**
+
+From the models in Section 3 and 4, we output three themed playlists with 10 tracks each for each of the above methods: Dance (danceability score > 0.7), Chill (tempo < 95, valence > 0.5), and Discover Unpopular (popularity < 60, artist popularity < 80).
+
+We have create a similar pipeline that takes the aforementioned playlists (stored as .csv files), (i) encodes the names of the playlists so the user/beta-tester does not know the theme or the method, (ii) creates playlists in the user's Spotify account, (iii) creates an encoding dictionary that allows the user to rate/comment on each of the playlists.
 
 ## Files:
 
-- `spotify_rec_sys.py`  This script performs a few functions:  
+There are a set of notebooks for each sections. Each notebook is self-contained. See above.
 
- 1. Requests and wrangles the full user profile including playback and library data through the Spotify API and handles the OAuth 2.0 authorization protocol. Upon providing a Spotify API `Client ID`, it requests permissions from a target user, and requests their Spotify:  
-	- user profile
-	- playback history (maximum history of 50)
-	- list of public and private playlists
-	- list of followed artists
-	- list of top artists and tracks (within the recent month)
-	- list of saved albums and tracks
-
-    Note that the Spotify API does not provide genres with albums as noted in [this thread on GitHub](https://github.com/spotify/web-api/issues/157). With the assumption that the artists album admits the same genre as the artist, the script populates the album genre field with the artist's genre.
-
- 2. Pulls and wrangles one random track and all relevant data regarding the track, artist, album, its audio features and extensive audio analysis
-
- 3. Pulls and wrangles 20 random tracks at a time and all relevant data - an scaled-up version of (2). Handles event when tracks that have no audio_features or audio_analysis (0.163% of tracks). Appends requested tracks to file.
 
 ## Getting Started
 
-1. Create a file `client_info.py` that defines the variables `CLIENT_ID` and `CLIENT_SECRET`.
-2. Install the listed packages prior to executing `spotify_rec_sys.py`.
+A pair of Spotify API keys (Client ID and Client SECRET) are required to run the notebooks. Visit the [Developer Dashboard](https://developer.spotify.com/dashboard/) for more. Create a file `client_info.py` that defines the variables CLIENT_ID and CLIENT_SECRET.
 
-## Author
+## Team
 - **Benedict Au** - [Github](https://github.com/benedictau1993/)
+- **Julian Kleindiek** - [Github](https://github.com/ju-kl)
+- **Yannik Kumar** - [Github](https://github.com/yannikkumar)
+- **Glory Scheel** - [Github](https://github.com/glorysch)
+- **Abhishek Yadav** - [Github](https://github.com/to-abhi-yadav)
