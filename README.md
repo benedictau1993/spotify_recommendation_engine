@@ -37,10 +37,10 @@ For our recommendation systems, we approach the problem from four different angl
 2. Regression models
 3. Track-based recommendation system
 
-  This notebook contains a function generating themed playlists based on songs a user likes or has listened to in the past. The function offers the user the ability to take the following approaches to receive recommendations:
-  -	It recommends new songs based on the audio features of a user's single favorite song.
-  -	It recommends new songs based on the average of the audio features of all songs a user has in its profile.
-  -	It recommends new songs based on the average of the audio features of any given list of songs the user specifies.
+    This notebook contains a function generating themed playlists based on songs a user likes or has listened to in the past. The function offers the user the ability to take the following approaches to receive recommendations:
+    -	It recommends new songs based on the audio features of a user's single favorite song.
+    -	It recommends new songs based on the average of the audio features of all songs a user has in its profile.
+    -	It recommends new songs based on the average of the audio features of any given list of songs the user specifies.
 
 
 4. Cluster-based recommendation system
