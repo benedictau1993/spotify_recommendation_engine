@@ -1,6 +1,6 @@
 # Flexible content-based music recommendations using Spotify
 
-[![School](https://img.shields.io/badge/UChicago-MSCA-red?style=for-the-badge)]() [![Course](https://img.shields.io/badge/Course-DataMining-lightgray?style=for-the-badge)]()  [![Contributors](https://img.shields.io/badge/Contributors-5-green?style=for-the-badge)]() [![Repo Size](https://img.shields.io/github/commit-activity/y/benedictau1993/spotify_recommendation_engine.svg?style=for-the-badge)]()
+[![School](https://img.shields.io/badge/UChicago-MSCA-red)]() [![Course](https://img.shields.io/badge/Course-DataMining-lightgray)]()  [![Contributors](https://img.shields.io/badge/Contributors-5-green)]() [![Repo Size](https://img.shields.io/github/commit-activity/y/benedictau1993/spotify_recommendation_engine.svg)]()
 
 ### *Tapping into the streaming giant’s wealth of data to create personal, configurable recommender systems*
 
