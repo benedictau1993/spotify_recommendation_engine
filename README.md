@@ -1,4 +1,7 @@
 # Flexible content-based music recommendations using Spotify
+
+[![School](https://img.shields.io/badge/UChicago-MSCA-red?style=for-the-badge)]() [![Course](https://img.shields.io/badge/Course-DataMining-lightgray?style=for-the-badge)]()  [![Contributors](https://img.shields.io/badge/Contributors-5-green?style=for-the-badge)]() [![Repo Size](https://img.shields.io/github/commit-activity/y/benedictau1993/spotify_recommendation_engine.svg?style=for-the-badge)]()
+
 ### *Tapping into the streaming giant’s wealth of data to create personal, configurable recommender systems*
 
 
@@ -41,7 +44,6 @@ For our recommendation systems, we approach the problem from four different angl
     -	It recommends new songs based on the audio features of a user's single favorite song.
     -	It recommends new songs based on the average of the audio features of all songs a user has in its profile.
     -	It recommends new songs based on the average of the audio features of any given list of songs the user specifies.
-
 
 4. Cluster-based recommendation system
 
