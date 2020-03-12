@@ -38,6 +38,10 @@ The purpose of this notebook is to apply different clustering techniques to crea
 For our recommendation systems, we approach the problem from four different angles.
 1. Classification models
 
+    Using classification modelling this notebook explores the predictive power of Spotify track features using labeled data, whether the user liked the song or not. After picking the model with the best testing and cross validation score we can:
+    - predict whether the user would like a song or not and give the probability of the user liking or disliking the song, on some global data frame.
+    - create three playlists of songs we predict the user will like
+    - each playlist is under a "theme" or mood that is determined by audio features such as tempo, etc.
 
 2. Regression models
     This notebook trains classical, tree-based, bagging and boosting regression models using a user rated playlist and predicts reviews on a global Spotify dataset to further create playlists based on audio attributes.
@@ -51,10 +55,7 @@ For our recommendation systems, we approach the problem from four different angl
 
 4. Cluster-based recommendation system
 
-    Using classification modelling this notebook explores the predictive power of Spotify track features using labeled data, whether the user liked the song or not. After picking the model with the best testing and cross validation score we can:
-    -predict whether the user would like a song or not and give the probability of the user liking or disliking the song, on some global data frame.
-    -create three playlists of songs we predict the user will like
-    -each playlist is under a "theme" or mood that is determined by audio features such as tempo, etc.
+    This notebook contains data preparation steps and two functions: one which finds the best clustering parameters for a user’s data, and two which produces three playlists based on the user’s data. Recommendations are based on songs that are closest to cluster centroids.
 
 #### 5. **Playlist publication.**
 
