@@ -44,6 +44,7 @@ For our recommendation systems, we approach the problem from four different angl
     - each playlist is under a "theme" or mood that is determined by audio features such as tempo, etc.
 
 2. Regression models
+
     This notebook trains classical, tree-based, bagging and boosting regression models using a user rated playlist and predicts reviews on a global Spotify dataset to further create playlists based on audio attributes.
 
 3. Track-based recommendation system
@@ -69,6 +70,7 @@ Finally we provide a script that creates a playlist in a user's Spotify account,
 
 There are a set of notebooks for each sections. Each notebook is self-contained. See above.
 
+We have also included our slide deck for our presentation.
 
 ## Getting Started
 
