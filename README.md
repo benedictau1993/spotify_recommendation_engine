@@ -37,7 +37,11 @@ The purpose of this notebook is to apply different clustering techniques to crea
 
 For our recommendation systems, we approach the problem from four different angles.
 1. Classification models
+
+
 2. Regression models
+    This notebook trains classical, tree-based, bagging and boosting regression models using a user rated playlist and predicts reviews on a global Spotify dataset to further create playlists based on audio attributes.
+
 3. Track-based recommendation system
 
     This notebook contains a function generating themed playlists based on songs a user likes or has listened to in the past. The function offers the user the ability to take the following approaches to receive recommendations:
@@ -46,6 +50,11 @@ For our recommendation systems, we approach the problem from four different angl
     -	It recommends new songs based on the average of the audio features of any given list of songs the user specifies.
 
 4. Cluster-based recommendation system
+
+    Using classification modelling this notebook explores the predictive power of Spotify track features using labeled data, whether the user liked the song or not. After picking the model with the best testing and cross validation score we can:
+    -predict whether the user would like a song or not and give the probability of the user liking or disliking the song, on some global data frame.
+    -create three playlists of songs we predict the user will like
+    -each playlist is under a "theme" or mood that is determined by audio features such as tempo, etc.
 
 #### 5. **Playlist publication.**
 
@@ -63,6 +72,8 @@ There are a set of notebooks for each sections. Each notebook is self-contained.
 ## Getting Started
 
 A pair of Spotify API keys (Client ID and Client SECRET) are required to run the notebooks. Visit the [Developer Dashboard](https://developer.spotify.com/dashboard/) for more. Create a file `client_info.py` that defines the variables CLIENT_ID and CLIENT_SECRET.
+
+If you would like a representative sample of our Spotify sample library scraped using the Section (1) notebook, please reach out to us.
 
 ## Team
 - **Benedict Au** - [Github](https://github.com/benedictau1993/)
